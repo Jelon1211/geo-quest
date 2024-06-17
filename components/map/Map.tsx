@@ -37,15 +37,17 @@ const Map: React.FC<MapProps> = ({ currentLocation, items }) => {
       >
         {items &&
           items.map((item: IItem) => {
-            const { uuid, title, geo } = item;
-            const [latitude, longitude] = parseGeoCoordinates(geo);
-
+            console.log(item);
+            if (!item.geo) {
+              return;
+            }
+            const [latitude, longitude] = parseGeoCoordinates(item.geo);
             return (
               <LocationMarker
-                key={uuid}
+                key={item.uuid}
                 latitude={latitude}
                 longitude={longitude}
-                title={title}
+                title={item.title}
                 onPress={() => {
                   handleMarkerPress(item);
                 }}
