@@ -20,8 +20,8 @@ const EmptyState = ({ title, subtitle }: IEmptyState) => {
       </Text>
 
       <CustomButton
-        title="Back to Explore"
-        handlePress={() => router.push("/home")}
+        title="Create a game!"
+        handlePress={() => router.push("/create")}
         containerStyles="w-full my-5"
       />
     </View>

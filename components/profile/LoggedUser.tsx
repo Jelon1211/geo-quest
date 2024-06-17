@@ -8,15 +8,21 @@ import { FlatList, TouchableOpacity } from "react-native";
 import EmptyState from "@/components/EmptyState";
 import InfoBox from "@/components/InfoBox";
 import ListItem from "@/components/list/ListItem";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const LoggedUser = () => {
-  const { setIsLogged } = useGlobalContext();
+const LoggedUser = ({ user }: any) => {
+  const { setUser, setAccessToken } = useGlobalContext();
+
   const [items, setItems] = useState([]);
 
-  const logout = () => {
-    setIsLogged(false);
+  const logout = async () => {
+    setUser(null);
+    setAccessToken(null);
+    await AsyncStorage.removeItem("refresh_token");
+
     router.replace("/");
   };
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
@@ -44,30 +50,28 @@ const LoggedUser = () => {
 
             <View className="w-16 h-16 border border-secondary rounded-lg flex justify-center items-center">
               <Image
-                source={images.profile}
+                source={{
+                  uri: user.profile_picture_url,
+                }}
                 className="w-[90%] h-[90%] rounded-lg"
                 resizeMode="cover"
               />
             </View>
 
             <InfoBox
-              title={"User Name"}
+              title={`${user.first_name} ${user.last_name}`}
               containerStyles="mt-5"
               titleStyles="text-lg"
             />
 
             <View className="mt-5 flex flex-row">
               <InfoBox
-                title={"666"}
+                title={"0"}
                 subtitle="Games"
                 titleStyles="text-xl"
                 containerStyles="mr-10"
               />
-              <InfoBox
-                title="1.2k"
-                subtitle="Followers"
-                titleStyles="text-xl"
-              />
+              <InfoBox title="0" subtitle="Followers" titleStyles="text-xl" />
             </View>
           </View>
         )}

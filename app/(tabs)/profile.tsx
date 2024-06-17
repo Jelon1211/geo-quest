@@ -5,19 +5,13 @@ import { router } from "expo-router";
 import { useEffect } from "react";
 
 const Profile = () => {
-  const { isLogged } = useGlobalContext();
+  const { user } = useGlobalContext();
 
-  useEffect(() => {
-    router.push({
-      pathname: "test",
-    });
-  }, []);
-
-  if (!isLogged) {
+  if (!user) {
     return <Discover />;
   }
 
-  return <LoggedUser />;
+  return <LoggedUser user={user} />;
 };
 
 export default Profile;

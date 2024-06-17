@@ -10,6 +10,7 @@ import ListItem from "@/components/list/ListItem";
 import Loading from "@/components/Loading";
 
 const Home: React.FC = () => {
+  const { user, setUser, setAccessToken } = useGlobalContext();
   const { items, loading, error, fetchMoreItems, refreshItems } =
     useItems(true);
   const [refreshing, setRefreshing] = useState(false);
