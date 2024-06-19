@@ -6,9 +6,12 @@ import {
   ScrollView,
 } from "react-native-gesture-handler";
 import { images } from "../../constants";
-import { router } from "expo-router";
+import { AuthService } from "@/services/authService";
 
 const Discover = () => {
+  const handleLogin = async () => {
+    await AuthService.initiateAuthSession();
+  };
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView className="bg-primary h-full">
@@ -50,8 +53,8 @@ const Discover = () => {
             </Text>
 
             <CustomButton
-              title="Continue with Email"
-              handlePress={() => router.push("/sign-in")}
+              title="Login"
+              handlePress={handleLogin}
               containerStyles="w-full mt-7"
             />
           </View>

@@ -10,7 +10,7 @@ export default class LoginService {
   static async loginAuth(userData: ILoginUser): Promise<IGetUserResponse> {
     try {
       const response = await fetch(
-        `https://8dac-91-235-160-56.ngrok-free.app/auth`,
+        `${process.env.EXPO_PUBLIC_BACKEND_API}/auth`,
         {
           method: "POST",
           headers: {
@@ -39,7 +39,7 @@ export default class LoginService {
   static async createUser(userData: ICreateUser): Promise<ICreateUserResponse> {
     try {
       const response = await fetch(
-        `https://8dac-91-235-160-56.ngrok-free.app/users`,
+        `${process.env.EXPO_PUBLIC_BACKEND_API}/users`,
         {
           method: "POST",
           headers: {
@@ -51,23 +51,6 @@ export default class LoginService {
 
       const data: ICreateUser = await response.json();
       return { data, status: response.status };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  static async logOut(): Promise<Response> {
-    try {
-      const response = await fetch(`https://www.citi-games.pl/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      return response;
     } catch (error) {
       throw error;
     }
