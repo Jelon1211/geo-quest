@@ -22,7 +22,7 @@ class ItemsService {
       // config.headers["Authorization"] = `Bearer ${this.authorizationToken}`;
       config.headers[
         "Authorization"
-      ] = `Bearer 1Gu93Rh^3bU5Umn3%9Du@5HWy23f@1!gR%ys`;
+      ] = `Bearer ${process.env.EXPO_PUBLIC_BACKEND_FIX_BEARER}`;
       return config;
     });
   }
