@@ -4,7 +4,7 @@ import { ICreateItem, IItem, IUpdateItem } from "@/types/itemservice";
 
 const itemsService = new ItemsService(
   {
-    baseURL: "https://www.citi-games.pl/",
+    baseURL: process.env.EXPO_PUBLIC_BACKEND_CITI || "",
   },
   "bearer token"
 );

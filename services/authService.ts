@@ -18,7 +18,7 @@ export class AuthService {
 
   static async exchangeCodeForToken(code: string) {
     try {
-      const response = await axios.post(process.env.EXPO_PUBLIC_AUTHENTICATE, {
+      const response = await axios.post(authenticateUrl, {
         client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
         client_secret: process.env.EXPO_PUBLIC_API_URL,
         grant_type: "authorization_code",
@@ -49,7 +49,6 @@ export class AuthService {
       });
 
       const data = response.data;
-      console.log(data);
 
       if (response.status === 200) {
         await AsyncStorage.setItem("refresh_token", data.refresh_token);
