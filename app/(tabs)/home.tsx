@@ -8,6 +8,7 @@ import EmptyState from "@/components/EmptyState";
 import categories from "@/constants/categories";
 import ListItem from "@/components/list/ListItem";
 import Loading from "@/components/Loading";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Home: React.FC = () => {
   const { user, setUser, setAccessToken } = useGlobalContext();
