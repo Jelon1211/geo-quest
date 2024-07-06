@@ -1,31 +1,18 @@
-import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
-import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { PopoverShortContentProps } from "@/types/list";
+import { View, ScrollView, Alert } from "react-native";
+import React, { useState, useEffect } from "react";
 import PopoverItem from "./PopoverItem";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { router } from "expo-router";
 import { openGoogleMaps } from "@/lib/geoUtils";
 import useItems from "@/hooks/useItems";
 import Loading from "../Loading";
+import { IMenuItems, PopoverContentProps } from "@/types/poporver";
 
-interface IMenuItems {
-  id: number;
-  label: string;
-  isActive: boolean;
-}
-
-const allItems = [
-  { id: 1, label: "Details", isActive: true },
-  { id: 2, label: "Navigate", isActive: true },
-  { id: 3, label: "Edit", isActive: true },
-  { id: 4, label: "Delete", isActive: true },
-  { id: 5, label: "Report", isActive: false },
-];
-
-const PopoverShortContent: React.FC<PopoverShortContentProps> = ({
+const PopoverContent: React.FC<PopoverContentProps> = ({
   uuid,
   geo,
   setPopoverVisible,
+  items,
 }) => {
   const { user } = useGlobalContext();
   const [menuItems, setMenuItems] = useState<IMenuItems[]>([]);
@@ -35,14 +22,12 @@ const PopoverShortContent: React.FC<PopoverShortContentProps> = ({
   useEffect(() => {
     if (!user) {
       setMenuItems(
-        allItems.filter(
-          (item) => item.label !== "Edit" && item.label !== "Delete"
-        )
+        items.filter((item) => item.label !== "Edit" && item.label !== "Delete")
       );
     } else {
-      setMenuItems(allItems);
+      setMenuItems(items);
     }
-  }, [user]);
+  }, [user, items]);
 
   const handlePress = async (action: any) => {
     switch (action) {
@@ -80,7 +65,8 @@ const PopoverShortContent: React.FC<PopoverShortContentProps> = ({
         break;
       case "Report":
         break;
-        defualt: throw new Error("no action handled");
+      default:
+        throw new Error("no action handled");
     }
   };
 
@@ -107,4 +93,4 @@ const PopoverShortContent: React.FC<PopoverShortContentProps> = ({
   );
 };
 
-export default PopoverShortContent;
+export default PopoverContent;

@@ -6,8 +6,9 @@ import {
 } from "react-native";
 import React, { useState, useRef } from "react";
 import Popover, { PopoverPlacement } from "react-native-popover-view";
-import PopoverShortContent from "./PopoverShortContent";
+import PopoverContent from "../popover/PopoverContent";
 import { IMenuButtonProps } from "@/types/list";
+import { extendedItems } from "../popover/popoverItems";
 
 const MenuButton: React.FC<IMenuButtonProps> = ({
   onPress,
@@ -50,10 +51,11 @@ const MenuButton: React.FC<IMenuButtonProps> = ({
         placement={PopoverPlacement.TOP}
         offset={30}
       >
-        <PopoverShortContent
+        <PopoverContent
           uuid={uuid}
           geo={geo}
           setPopoverVisible={setPopoverVisible}
+          items={extendedItems}
         />
       </Popover>
     </View>

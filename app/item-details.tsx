@@ -15,7 +15,8 @@ import useItems from "@/hooks/useItems";
 import { formatDate } from "@/lib/dateUtils";
 import { openGoogleMaps } from "@/lib/geoUtils";
 import Popover, { PopoverPlacement } from "react-native-popover-view";
-import PopoverExtendedContent from "@/components/list/PopoverExtendedContent";
+import PopoverContent from "@/components/popover/PopoverContent";
+import { shortItems } from "@/components/popover/popoverItems";
 
 interface IItemDetails {
   onPress?: (event: GestureResponderEvent) => void;
@@ -98,10 +99,11 @@ const ItemDetails: React.FC<IItemDetails> = ({ onPress }) => {
             placement={PopoverPlacement.BOTTOM}
             offset={30}
           >
-            <PopoverExtendedContent
+            <PopoverContent
               uuid={item.uuid}
               geo={""}
               setPopoverVisible={setPopoverVisible}
+              items={shortItems}
             />
           </Popover>
 
