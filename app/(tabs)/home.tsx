@@ -8,9 +8,10 @@ import EmptyState from "@/components/EmptyState";
 import categories from "@/constants/categories";
 import ListItem from "@/components/list/ListItem";
 import Loading from "@/components/Loading";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Home: React.FC = () => {
-  const { user, setUser, setAccessToken } = useGlobalContext();
+  const { user } = useGlobalContext();
   const { items, loading, error, fetchMoreItems, refreshItems } =
     useItems(true);
   const [refreshing, setRefreshing] = useState(false);
