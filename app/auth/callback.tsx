@@ -1,29 +1,49 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import React, { useEffect } from "react";
+import { View, Text } from "react-native";
+import { useGlobalContext } from "@/context/GlobalProvider";
+import { AuthService } from "@/services/authService";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 const Callback = () => {
-  const route = useRoute();
+  const router = useRouter();
+
+  const { code } = useLocalSearchParams();
+  const { setUser, setAccessToken } = useGlobalContext();
+
+  useEffect(() => {
+    console.log(code);
+    const userCall = async () => {
+      try {
+        if (typeof code === "string") {
+          const data = await AuthService.exchangeCodeForToken(code);
+
+          const { access_token, user } = data;
+
+          console.log(data);
+
+          setUser(user);
+          setAccessToken(access_token);
+          router.push({
+            pathname: "home",
+          });
+        } else {
+          console.error("Code is not a string");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (code) {
+      userCall();
+    }
+  }, [code]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Current Route: {route.name}</Text>
+    <View className="flex-1 justify-center items-center">
+      <Text>Authorizing...</Text>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5", // Tło kontenera
-  },
-  text: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333", // Kolor tekstu
-  },
-});
 
 export default Callback;
