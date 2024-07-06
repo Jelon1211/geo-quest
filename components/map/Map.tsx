@@ -37,7 +37,6 @@ const Map: React.FC<MapProps> = ({ currentLocation, items }) => {
       >
         {items &&
           items.map((item: IItem) => {
-            console.log(item);
             if (!item.geo) {
               return;
             }

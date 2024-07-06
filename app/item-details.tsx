@@ -6,17 +6,37 @@ import {
   Image,
   ActivityIndicator,
   ScrollView,
+  GestureResponderEvent,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { icons, images } from "@/constants";
 import useItems from "@/hooks/useItems";
 import { formatDate } from "@/lib/dateUtils";
 import { openGoogleMaps } from "@/lib/geoUtils";
+import Popover, { PopoverPlacement } from "react-native-popover-view";
+import PopoverExtendedContent from "@/components/list/PopoverExtendedContent";
 
-const ItemDetails = () => {
+interface IItemDetails {
+  onPress?: (event: GestureResponderEvent) => void;
+}
+
+const ItemDetails: React.FC<IItemDetails> = ({ onPress }) => {
   const { itemUuid } = useLocalSearchParams();
   const { item, loading, error, fetchItemById } = useItems();
+  const [popoverVisible, setPopoverVisible] = useState<boolean>(false);
+  const menuButtonRef = useRef(null);
+
+  const handleMenuPress = (event: GestureResponderEvent) => {
+    setPopoverVisible(true);
+    if (onPress) {
+      onPress(event);
+    }
+  };
+
+  const handleClosePopover = () => {
+    setPopoverVisible(false);
+  };
 
   useEffect(() => {
     if (typeof itemUuid === "string") {
@@ -58,7 +78,32 @@ const ItemDetails = () => {
               className="rounded-lg"
               resizeMode="cover"
             />
+            <TouchableOpacity
+              className="absolute right-1 top-5 w-12 h-12"
+              onPress={handleMenuPress}
+              ref={menuButtonRef}
+            >
+              <Image
+                source={icons.menu}
+                className="w-6 h-6"
+                resizeMode="contain"
+                tintColor="#000"
+              />
+            </TouchableOpacity>
           </View>
+          <Popover
+            isVisible={popoverVisible}
+            from={menuButtonRef}
+            onRequestClose={handleClosePopover}
+            placement={PopoverPlacement.BOTTOM}
+            offset={30}
+          >
+            <PopoverExtendedContent
+              uuid={item.uuid}
+              geo={""}
+              setPopoverVisible={setPopoverVisible}
+            />
+          </Popover>
 
           <View className="flex flex-row justify-between items-center px-4 py-2">
             <View className="flex flex-row gap-2">

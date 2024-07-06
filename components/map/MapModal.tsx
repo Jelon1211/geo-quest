@@ -1,24 +1,30 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   Modal,
   TouchableOpacity,
   Image,
-  Linking,
+  GestureResponderEvent,
 } from "react-native";
 import images from "@/constants/images";
 import icons from "@/constants/icons";
-import { MapModalProps } from "@/types/map";
+import { IMapModalProps } from "@/types/map";
 import { openGoogleMaps } from "@/lib/geoUtils";
+import { router } from "expo-router";
 
-const MapModal: React.FC<MapModalProps> = ({
-  visible,
-  onClose,
-  marker,
-  currentLocation,
-}) => {
+const MapModal: React.FC<IMapModalProps> = ({ visible, onClose, marker }) => {
   if (!marker) return null;
+
+  const openDetails = () => {
+    onClose();
+    router.push({
+      pathname: "item-details",
+      params: {
+        itemUuid: marker.uuid,
+      },
+    });
+  };
 
   return (
     <Modal
@@ -39,7 +45,11 @@ const MapModal: React.FC<MapModalProps> = ({
               resizeMode="contain"
             />
           </TouchableOpacity>
-          <Text className="text-2xl font-bold text-center">{marker.title}</Text>
+          <TouchableOpacity onPress={openDetails}>
+            <Text className="text-2xl font-bold text-center">
+              {marker.title}
+            </Text>
+          </TouchableOpacity>
           <Image
             source={images.thumbnail}
             className="w-full max-w-72 max-h-52"
@@ -51,12 +61,14 @@ const MapModal: React.FC<MapModalProps> = ({
               {marker.description}
             </Text>
             <View className="flex flex-row gap-7 pt-3 items-center justify-end">
-              <Image
-                source={icons.seeMore}
-                className="w-6 h-6"
-                tintColor="#FF9C01"
-                resizeMode="contain"
-              />
+              <TouchableOpacity onPress={openDetails}>
+                <Image
+                  source={icons.seeMore}
+                  className="w-6 h-6"
+                  tintColor="#FF9C01"
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => openGoogleMaps(marker.geo)}>
                 <Image
                   source={icons.map}
@@ -65,12 +77,6 @@ const MapModal: React.FC<MapModalProps> = ({
                   resizeMode="contain"
                 />
               </TouchableOpacity>
-              <Image
-                source={icons.menu}
-                className="w-8 h-8"
-                tintColor="#FF9C01"
-                resizeMode="contain"
-              />
             </View>
           </View>
         </View>

@@ -1,3 +1,4 @@
+import { GestureResponderEvent } from "react-native";
 import { IItem } from "./itemservice";
 
 export interface IRegion {
@@ -46,4 +47,5 @@ export interface IMapModalProps {
   onClose: () => void;
   marker: IItem | null;
   currentLocation: ICurrentLocation;
+  onPress?: (event: GestureResponderEvent) => void;
 }

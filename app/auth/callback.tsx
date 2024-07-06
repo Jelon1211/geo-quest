@@ -11,15 +11,12 @@ const Callback = () => {
   const { setUser, setAccessToken } = useGlobalContext();
 
   useEffect(() => {
-    console.log(code);
     const userCall = async () => {
       try {
         if (typeof code === "string") {
           const data = await AuthService.exchangeCodeForToken(code);
 
           const { access_token, user } = data;
-
-          console.log(data);
 
           setUser(user);
           setAccessToken(access_token);

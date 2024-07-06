@@ -33,13 +33,6 @@ class ItemsService {
     params?: any,
     data?: any
   ): Promise<T> {
-    const fullUrl = `${this.axiosInstance.defaults.baseURL}${url}`;
-    console.log(
-      `Request URL: ${fullUrl}`,
-      params ? `Params: ${JSON.stringify(params)}` : "",
-      data ? `Data: ${JSON.stringify(data)}` : ""
-    );
-
     try {
       const response: AxiosResponse<T> = await this.axiosInstance.request<T>({
         method,

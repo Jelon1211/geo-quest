@@ -35,8 +35,6 @@ const Play = () => {
     }, [currentLocation])
   );
 
-  console.log(currentLocation);
-
   return (
     <View className="flex-1 items-center justify-center bg-white">
       {loading ? (

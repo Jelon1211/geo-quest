@@ -44,7 +44,6 @@ const useLocation = () => {
 
     const getLocationAndLog = async () => {
       const location = await getLocation();
-      console.log(location);
     };
 
     if (!intervalIdRef.current) {

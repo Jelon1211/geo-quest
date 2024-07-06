@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { PopoverContentProps } from "@/types/list";
+import { PopoverShortContentProps } from "@/types/list";
 import PopoverItem from "./PopoverItem";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { router } from "expo-router";
@@ -22,18 +22,18 @@ const allItems = [
   { id: 5, label: "Report", isActive: false },
 ];
 
-const PopoverContent: React.FC<PopoverContentProps> = ({
+const PopoverShortContent: React.FC<PopoverShortContentProps> = ({
   uuid,
   geo,
   setPopoverVisible,
 }) => {
-  const { isLogged } = useGlobalContext();
+  const { user } = useGlobalContext();
   const [menuItems, setMenuItems] = useState<IMenuItems[]>([]);
   const { loading, deleteItem } = useItems();
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!isLogged) {
+    if (!user) {
       setMenuItems(
         allItems.filter(
           (item) => item.label !== "Edit" && item.label !== "Delete"
@@ -42,7 +42,7 @@ const PopoverContent: React.FC<PopoverContentProps> = ({
     } else {
       setMenuItems(allItems);
     }
-  }, [isLogged]);
+  }, [user]);
 
   const handlePress = async (action: any) => {
     switch (action) {
@@ -79,7 +79,6 @@ const PopoverContent: React.FC<PopoverContentProps> = ({
         openGoogleMaps(geo);
         break;
       case "Report":
-        console.log("reports");
         break;
         defualt: throw new Error("no action handled");
     }
@@ -108,4 +107,4 @@ const PopoverContent: React.FC<PopoverContentProps> = ({
   );
 };
 
-export default PopoverContent;
+export default PopoverShortContent;
