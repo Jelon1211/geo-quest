@@ -8,23 +8,29 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 class ItemsService {
   private axiosInstance: AxiosInstance;
-  private authorizationToken: string;
+  private authorizationToken?: string;
+  private appToken: string;
 
-  constructor(config: IApiConfig, authorizationToken: string) {
+  constructor(config: IApiConfig) {
     this.axiosInstance = axios.create({
       baseURL: config.baseURL,
       timeout: config.timeout || 10000,
     });
 
-    this.authorizationToken = authorizationToken;
+    this.appToken =
+      process.env.EXPO_PUBLIC_BACKEND_X_APP_BEARER || config.appToken;
 
     this.axiosInstance.interceptors.request.use((config) => {
-      // config.headers["Authorization"] = `Bearer ${this.authorizationToken}`;
-      config.headers[
-        "Authorization"
-      ] = `Bearer ${process.env.EXPO_PUBLIC_BACKEND_FIX_BEARER}`;
+      if (this.authorizationToken) {
+        config.headers["Authorization"] = `Bearer ${this.authorizationToken}`;
+      }
+      config.headers["X-App-Token"] = `Bearer ${this.appToken}`;
       return config;
     });
+  }
+
+  public setAuthorizationToken(token: string): void {
+    this.authorizationToken = token;
   }
 
   private async request<T>(

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import { AuthService } from "@/services/authService";
@@ -15,14 +15,18 @@ const Callback = () => {
       try {
         if (typeof code === "string") {
           const data = await AuthService.exchangeCodeForToken(code);
-
           const { access_token, user } = data;
+
+          const backendData = await AuthService.registerUser(access_token);
+
+          console.log(backendData);
 
           setUser(user);
           setAccessToken(access_token);
-          router.push({
-            pathname: "home",
-          });
+
+          // router.push({
+          //   pathname: "home",
+          // });
         } else {
           console.error("Code is not a string");
         }

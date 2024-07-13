@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import ItemsService from "@/services/itemsService";
 import { ICreateItem, IItem, IUpdateItem } from "@/types/itemservice";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
-const itemsService = new ItemsService(
-  {
-    baseURL: process.env.EXPO_PUBLIC_BACKEND_CITI || "",
-  },
-  "bearer token"
-);
+const itemsService = new ItemsService({
+  baseURL: process.env.EXPO_PUBLIC_BACKEND_CITI || "",
+  appToken: "Bearer xxx",
+});
 
 const useItems = (initialFetch = false) => {
+  const { accessToken } = useGlobalContext();
   const [items, setItems] = useState<IItem[]>([]);
   const [item, setItem] = useState<IItem | null>(null);
   const [loading, setLoading] = useState<boolean>(initialFetch);
@@ -18,10 +18,13 @@ const useItems = (initialFetch = false) => {
   const [hasMore, setHasMore] = useState<boolean>(true);
 
   useEffect(() => {
+    if (accessToken) {
+      itemsService.setAuthorizationToken(accessToken);
+    }
     if (initialFetch) {
       fetchItems(0);
     }
-  }, [initialFetch]);
+  }, [accessToken, initialFetch]);
 
   const fetchItems = async (pageNumber: number = 0) => {
     setLoading(true);

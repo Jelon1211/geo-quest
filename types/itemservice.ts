@@ -1,6 +1,8 @@
 export interface IApiConfig {
   baseURL: string;
   timeout?: number;
+  appToken: string;
+  authorizationToken?: string;
 }
 
 export interface IItem {

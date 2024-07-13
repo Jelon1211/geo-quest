@@ -61,4 +61,28 @@ export class AuthService {
       throw error;
     }
   }
+
+  static async registerUser(access_token: string) {
+    console.log(access_token);
+    try {
+      const response = await axios.post(
+        `https://citi-games.pl/users`,
+        {},
+        {
+          headers: {
+            "X-App-token": "Bearer 1Gu93Rh^3bU5Umn3%9Du@5HWy23f@1!gR%ys",
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      const data = response.data;
+
+      console.log(response);
+      console.log(data);
+    } catch (error) {
+      console.error("error test", error.data);
+      throw error;
+    }
+  }
 }
