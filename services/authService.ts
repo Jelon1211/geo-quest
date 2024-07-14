@@ -28,7 +28,6 @@ export class AuthService {
       const data = response.data;
 
       if (response.status === 200) {
-        await AsyncStorage.setItem("refresh_token", data.refresh_token);
         return data;
       } else {
         throw new Error(data.error || "Failed to exchange code for token");
@@ -51,7 +50,6 @@ export class AuthService {
       const data = response.data;
 
       if (response.status === 200) {
-        await AsyncStorage.setItem("refresh_token", data.refresh_token);
         return data;
       } else {
         throw new Error(data.error || "Failed to exchange code for token");
@@ -63,26 +61,47 @@ export class AuthService {
   }
 
   static async registerUser(access_token: string) {
-    console.log(access_token);
+    const headers = {
+      "X-App-token": "Bearer 1Gu93Rh^3bU5Umn3%9Du@5HWy23f@1!gR%ys",
+      Authorization: `Bearer ${access_token}`,
+    };
+
+    try {
+      const isUserRegistered = await this.checkUserRegistration(headers);
+      if (isUserRegistered) {
+        return true;
+      }
+      return await this.registerNewUser(headers);
+    } catch (error) {
+      console.error("Error during user registration process", error);
+      return false;
+    }
+  }
+
+  private static async checkUserRegistration(headers: object) {
+    try {
+      const response = await axios.get(`https://citi-games.pl/users/me`, {
+        headers,
+      });
+      return response.status === 200;
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        return false;
+      }
+    }
+  }
+
+  private static async registerNewUser(headers: object) {
     try {
       const response = await axios.post(
         `https://citi-games.pl/users`,
         {},
-        {
-          headers: {
-            "X-App-token": "Bearer 1Gu93Rh^3bU5Umn3%9Du@5HWy23f@1!gR%ys",
-            Authorization: `Bearer ${access_token}`,
-          },
-        }
+        { headers }
       );
-
-      const data = response.data;
-
-      console.log(response);
-      console.log(data);
+      return response.status === 200;
     } catch (error) {
-      console.error("error test", error.data);
-      throw error;
+      console.error("Error during POST to /users", error);
+      return false;
     }
   }
 }

@@ -1,22 +1,27 @@
 import React, { useEffect } from "react";
 import { Redirect } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthService } from "@/services/authService";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import { TokenStorage } from "@/services/storageService";
 
 const Index = () => {
-  const { setUser } = useGlobalContext();
+  const { setUser, setAccessToken } = useGlobalContext();
 
   useEffect(() => {
     const prepareToken = async () => {
-      const refreshToken = await AsyncStorage.getItem("refresh_token");
+      const refreshToken = await TokenStorage.getItem("refresh_token");
       if (!refreshToken) {
         return;
       }
       const data = await AuthService.refreshAuthSession(refreshToken);
-      const { user } = data;
+      const { user, access_token } = data;
 
-      setUser(user);
+      const backendData = await AuthService.registerUser(access_token);
+
+      if (backendData) {
+        setUser(user);
+        setAccessToken(access_token);
+      }
     };
     prepareToken();
   }, []);
