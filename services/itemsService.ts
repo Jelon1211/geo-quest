@@ -59,11 +59,11 @@ class ItemsService {
     sort: string = "id"
   ): Promise<any> {
     const params = { skip, limit, order, sort };
-    return this.request<any>("GET", "/items", params);
+    return this.request<any>("GET", "open/items", params);
   }
 
   public async getItemById(itemId: string): Promise<any> {
-    return this.request<any>("GET", `/items/${itemId}`);
+    return this.request<any>("GET", `open/items/${itemId}`);
   }
 
   public async createItem(itemData: ICreateItem): Promise<any> {
