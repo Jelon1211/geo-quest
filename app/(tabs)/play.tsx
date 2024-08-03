@@ -1,13 +1,16 @@
 import { View, Text } from "react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import useLocation from "@/hooks/useLocation";
 import { useFocusEffect } from "@react-navigation/native";
 import PermissionMessage from "@/components/PermissionMessage";
 import Map from "@/components/map/Map";
 import Loading from "@/components/Loading";
 import useItems from "@/hooks/useItems";
+import * as Location from "expo-location";
 
 const Play = () => {
+  const [hasLocationPermission, setHasLocationPermission] =
+    useState<boolean>(false);
   const { permissionDenied, errorMessage, currentLocation, getLocation } =
     useLocation();
   const { items, loading, error } = useItems(true);
@@ -22,18 +25,28 @@ const Play = () => {
   //   }, [startLocationUpdates, stopLocationUpdates])
   // );
 
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      setHasLocationPermission(status === "granted");
+    };
+
+    checkPermissions();
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      // refresh if gps disabled
-      const interval = setInterval(() => {
+      if (hasLocationPermission) {
         if (!currentLocation) {
           getLocation();
         }
-      }, 2000);
-
-      return () => clearInterval(interval);
-    }, [currentLocation])
+      }
+    }, [currentLocation, hasLocationPermission])
   );
+
+  if (hasLocationPermission === null) {
+    return <Loading />;
+  }
 
   return (
     <View className="flex-1 items-center justify-center bg-white">
@@ -46,10 +59,12 @@ const Play = () => {
       ) : (
         <Loading />
       )}
-      <PermissionMessage
-        permissionDenied={permissionDenied}
-        errorMessage={errorMessage}
-      />
+      {hasLocationPermission === false && (
+        <PermissionMessage
+          permissionDenied={permissionDenied}
+          errorMessage={errorMessage}
+        />
+      )}
     </View>
   );
 };

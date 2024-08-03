@@ -22,7 +22,7 @@ export interface SignUpFormState {
 
 export interface ICreateForm {
   title: string;
-  image?: any;
+  images?: any;
   description: string;
   itemType: string;
   location: {

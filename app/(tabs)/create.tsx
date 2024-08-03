@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { icons } from "../../constants";
 import FormField from "@/components/FormField";
@@ -17,11 +18,13 @@ import LocationPicker from "@/components/map/LocationPicker";
 import { ICreateForm } from "@/types/formfield";
 import { router } from "expo-router";
 import useItems from "@/hooks/useItems";
+import * as ImageManipulator from "expo-image-manipulator";
+import axios from "axios";
 
 const Create = () => {
   const [form, setForm] = useState<ICreateForm>({
     title: "",
-    image: null as any,
+    images: [],
     description: "",
     itemType: "book",
     location: {
@@ -33,12 +36,36 @@ const Create = () => {
   const { createItem, loading, error } = useItems();
 
   const handleImagePick = async () => {
-    const image = await openPicker();
-    if (image) {
+    const images = await openPicker();
+    if (images.length > 0) {
+      const resizedImages = await Promise.all(
+        images.map(async (image) => {
+          const resizedUri = await resizeImage(image.uri);
+          return { ...image, uri: resizedUri };
+        })
+      );
+
+      console.log(resizedImages);
+
       setForm({
         ...form,
-        image: image,
+        images: resizedImages, // zmiana z image na images
       });
+    }
+  };
+
+  const resizeImage = async (uri: string) => {
+    try {
+      const manipulatedImage = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 480 } }],
+        { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      console.log(`Original URI: ${uri}, Resized URI: ${manipulatedImage.uri}`);
+      return manipulatedImage.uri;
+    } catch (error) {
+      console.error("Error resizing image:", error);
+      return uri; // zwracamy oryginalny URI w przypadku błędu
     }
   };
 
@@ -52,7 +79,7 @@ const Create = () => {
   const submit = async () => {
     if (
       !form.title ||
-      !form.image ||
+      !form.images ||
       !form.description ||
       !form.location.latitude ||
       !form.location.longitude
@@ -113,28 +140,37 @@ const Create = () => {
 
         <View className="mt-7 space-y-2">
           <Text className="text-base text-gray-100 font-medium">
-            Upload Image
+            Upload Images
           </Text>
 
           <TouchableOpacity onPress={handleImagePick}>
-            {form.image ? (
-              <Image
-                source={{ uri: form.image.uri }}
-                resizeMode="cover"
-                className="w-full h-64 rounded-2xl"
-              />
-            ) : (
-              <View className="w-full h-40 px-4 bg-gray-800 rounded-2xl border border-gray-600 flex justify-center items-center">
-                <View className="w-14 h-14 border border-dashed border-secondary-100 flex justify-center items-center">
-                  <Image
-                    source={icons.upload}
-                    resizeMode="contain"
-                    className="w-1/2 h-1/2"
-                  />
-                </View>
+            <View className="w-full h-40 px-4 bg-gray-800 rounded-2xl border border-gray-600 flex justify-center items-center">
+              <View className="w-14 h-14 border border-dashed border-secondary-100 flex justify-center items-center">
+                <Image
+                  source={icons.upload}
+                  resizeMode="contain"
+                  className="w-1/2 h-1/2"
+                />
               </View>
-            )}
+            </View>
           </TouchableOpacity>
+
+          {form.images.length > 0 && (
+            <FlatList
+              data={form.images}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <Image
+                  source={{ uri: item.uri }}
+                  resizeMode="cover"
+                  className="w-64 h-64 rounded-2xl mx-2"
+                />
+              )}
+              contentContainerStyle={{ paddingVertical: 10 }}
+            />
+          )}
         </View>
 
         <FormField

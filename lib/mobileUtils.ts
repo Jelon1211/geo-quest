@@ -3,14 +3,15 @@ import * as ImagePicker from "expo-image-picker";
 export const openPicker = async () => {
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
+    allowsMultipleSelection: true,
+    selectionLimit: 5,
     aspect: [4, 3],
-    quality: 1,
+    quality: 0.5,
   });
 
   if (!result.canceled) {
-    return result.assets[0];
+    return result.assets;
   } else {
-    return null;
+    return [];
   }
 };
