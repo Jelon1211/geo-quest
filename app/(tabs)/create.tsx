@@ -19,7 +19,7 @@ import { ICreateForm } from "@/types/formfield";
 import { router } from "expo-router";
 import useItems from "@/hooks/useItems";
 import * as ImageManipulator from "expo-image-manipulator";
-import axios from "axios";
+import Loading from "@/components/Loading";
 
 const Create = () => {
   const [form, setForm] = useState<ICreateForm>({
@@ -34,8 +34,11 @@ const Create = () => {
   });
 
   const { createItem, loading, error } = useItems();
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
 
   const handleImagePick = async () => {
+    setIsImageLoading(true);
+    setForm({ ...form, images: [] });
     const images = await openPicker();
     if (images.length > 0) {
       const resizedImages = await Promise.all(
@@ -52,6 +55,7 @@ const Create = () => {
         images: resizedImages, // zmiana z image na images
       });
     }
+    setIsImageLoading(false);
   };
 
   const resizeImage = async (uri: string) => {
@@ -65,7 +69,7 @@ const Create = () => {
       return manipulatedImage.uri;
     } catch (error) {
       console.error("Error resizing image:", error);
-      return uri; // zwracamy oryginalny URI w przypadku błędu
+      return uri;
     }
   };
 
@@ -109,7 +113,7 @@ const Create = () => {
         });
         setForm({
           title: "",
-          image: null,
+          images: null,
           description: "",
           itemType: "book",
           location: {
@@ -155,6 +159,13 @@ const Create = () => {
             </View>
           </TouchableOpacity>
 
+          {isImageLoading ? (
+            <View>
+              <Loading />
+            </View>
+          ) : (
+            ""
+          )}
           {form.images.length > 0 && (
             <FlatList
               data={form.images}
