@@ -143,21 +143,37 @@ const Create = () => {
         />
 
         <View className="mt-7 space-y-2">
-          <Text className="text-base text-gray-100 font-medium">
-            Upload Images
-          </Text>
+          <View
+            className={
+              form.images.length > 0
+                ? "flex flex-row w-100 justify-between items-center"
+                : ""
+            }
+          >
+            <Text className="text-base text-gray-100 font-medium">
+              Upload Images
+            </Text>
 
-          <TouchableOpacity onPress={handleImagePick}>
-            <View className="w-full h-40 px-4 bg-gray-800 rounded-2xl border border-gray-600 flex justify-center items-center">
-              <View className="w-14 h-14 border border-dashed border-secondary-100 flex justify-center items-center">
-                <Image
-                  source={icons.upload}
-                  resizeMode="contain"
-                  className="w-1/2 h-1/2"
-                />
+            <TouchableOpacity onPress={handleImagePick}>
+              <View
+                className={`mt-3 bg-gray-800 rounded-2xl border border-gray-600 flex justify-center items-center ${
+                  form.images.length > 0 ? "w-10 h-10" : "w-full h-40"
+                }`}
+              >
+                <View
+                  className={`border border-dashed border-secondary-100 flex justify-center items-center
+                    ${form.images.length > 0 ? "w-6 h-6" : "w-10 h-10"}
+                  `}
+                >
+                  <Image
+                    source={icons.upload}
+                    resizeMode="contain"
+                    className="w-1/2 h-1/2"
+                  />
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
 
           {isImageLoading ? (
             <View>
