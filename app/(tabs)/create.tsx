@@ -52,7 +52,7 @@ const Create = () => {
 
       setForm({
         ...form,
-        images: resizedImages, // zmiana z image na images
+        images: resizedImages,
       });
     }
     setIsImageLoading(false);
