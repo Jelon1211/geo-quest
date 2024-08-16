@@ -65,7 +65,7 @@ const Create = () => {
         [{ resize: { width: 480 } }],
         { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
       );
-      console.log(`Original URI: ${uri}, Resized URI: ${manipulatedImage.uri}`);
+
       return manipulatedImage.uri;
     } catch (error) {
       console.error("Error resizing image:", error);
