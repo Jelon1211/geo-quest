@@ -1,105 +1,45 @@
-import { useState } from "react";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  View,
-  Text,
-  Alert,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
-} from "react-native";
-import { icons } from "../../constants";
+import { ScrollView, Text, Alert } from "react-native";
 import FormField from "@/components/FormField";
 import CustomButton from "@/components/CustomButton";
-import { generateUUID } from "@/lib/uuidUtils";
-import { openPicker } from "@/lib/mobileUtils";
 import LocationPicker from "@/components/map/LocationPicker";
-import { ICreateForm } from "@/types/formfield";
-import { router } from "expo-router";
 import useItems from "@/hooks/useItems";
-import * as ImageManipulator from "expo-image-manipulator";
-import Loading from "@/components/Loading";
+import useCreateForm from "@/hooks/useCreateForm";
+import ImagePicker from "@/components/form/ImagePicker";
+import { generateUUID } from "@/lib/uuidUtils";
+import { router } from "expo-router";
 
 const Create = () => {
-  const [form, setForm] = useState<ICreateForm>({
-    title: "",
-    images: [],
-    description: "",
-    itemType: "book",
-    location: {
-      latitude: null as number | null,
-      longitude: null as number | null,
-    },
-  });
-
-  const { createItem, loading, error } = useItems();
-  const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
-
-  const handleImagePick = async () => {
-    setIsImageLoading(true);
-    setForm({ ...form, images: [] });
-    const images = await openPicker();
-    if (images.length > 0) {
-      const resizedImages = await Promise.all(
-        images.map(async (image) => {
-          const resizedUri = await resizeImage(image.uri);
-          return { ...image, uri: resizedUri };
-        })
-      );
-
-      console.log(resizedImages);
-
-      setForm({
-        ...form,
-        images: resizedImages,
-      });
-    }
-    setIsImageLoading(false);
-  };
-
-  const resizeImage = async (uri: string) => {
-    try {
-      const manipulatedImage = await ImageManipulator.manipulateAsync(
-        uri,
-        [{ resize: { width: 480 } }],
-        { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
-      );
-
-      return manipulatedImage.uri;
-    } catch (error) {
-      console.error("Error resizing image:", error);
-      return uri;
-    }
-  };
-
-  const setLocation = (location: {
-    latitude: number | null;
-    longitude: number | null;
-  }) => {
-    setForm({ ...form, location });
-  };
+  const {
+    createForm,
+    setCreateForm,
+    handleImagePick,
+    isImageLoading,
+    setLocation,
+  } = useCreateForm();
+  const { createItem, loading } = useItems();
 
   const submit = async () => {
     if (
-      !form.title ||
-      !form.images ||
-      !form.description ||
-      !form.location.latitude ||
-      !form.location.longitude
+      !createForm.title ||
+      !createForm.images ||
+      !createForm.description ||
+      !createForm.location.latitude ||
+      !createForm.location.longitude
     ) {
       Alert.alert("Error", "All fields are required!");
       return;
     }
 
     const itemData = {
-      title: form.title,
-      description: form.description,
-      item_type: form.itemType,
+      title: createForm.title,
+      description: createForm.description,
+      item_type: createForm.itemType,
       owner: generateUUID(),
       created_by: generateUUID(),
-      lat: form.location.latitude,
-      lon: form.location.longitude,
+      lat: createForm.location.latitude,
+      lon: createForm.location.longitude,
     };
 
     try {
@@ -111,18 +51,15 @@ const Create = () => {
             itemUuid: data.uuid,
           },
         });
-        setForm({
+        setCreateForm({
           title: "",
           images: null,
           description: "",
           itemType: "book",
-          location: {
-            latitude: null,
-            longitude: null,
-          },
+          location: { latitude: null, longitude: null },
         });
       }
-    } catch (er) {
+    } catch {
       Alert.alert("Error", "There was an error creating the item.");
     }
   };
@@ -136,88 +73,44 @@ const Create = () => {
 
         <FormField
           title="Game Title"
-          value={form.title}
+          value={createForm.title}
           placeholder="Give your game a catchy title..."
-          handleChangeText={(e) => setForm({ ...form, title: e })}
+          handleChangeText={(e) => setCreateForm({ ...createForm, title: e })}
           otherStyles="mt-10"
         />
 
-        <View className="mt-7 space-y-2">
-          <View
-            className={
-              form.images.length > 0
-                ? "flex flex-row w-100 justify-between items-center"
-                : ""
-            }
-          >
-            <Text className="text-base text-gray-100 font-medium">
-              Upload Images
-            </Text>
-
-            <TouchableOpacity onPress={handleImagePick}>
-              <View
-                className={`mt-3 bg-gray-800 rounded-2xl border border-gray-600 flex justify-center items-center ${
-                  form.images.length > 0 ? "w-10 h-10" : "w-full h-40"
-                }`}
-              >
-                <View
-                  className={`border border-dashed border-secondary-100 flex justify-center items-center
-                    ${form.images.length > 0 ? "w-6 h-6" : "w-10 h-10"}
-                  `}
-                >
-                  <Image
-                    source={icons.upload}
-                    resizeMode="contain"
-                    className="w-1/2 h-1/2"
-                  />
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          {isImageLoading ? (
-            <View>
-              <Loading />
-            </View>
-          ) : (
-            ""
-          )}
-          {form.images.length > 0 && (
-            <FlatList
-              data={form.images}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <Image
-                  source={{ uri: item.uri }}
-                  resizeMode="cover"
-                  className="w-64 h-64 rounded-2xl mx-2"
-                />
-              )}
-              contentContainerStyle={{ paddingVertical: 10 }}
-            />
-          )}
-        </View>
+        <ImagePicker
+          images={createForm.images}
+          isImageLoading={isImageLoading}
+          handleImagePick={handleImagePick}
+        />
 
         <FormField
           title="Description"
-          value={form.description}
+          value={createForm.description}
           placeholder="Description of your game..."
-          handleChangeText={(e) => setForm({ ...form, description: e })}
+          handleChangeText={(e) =>
+            setCreateForm({ ...createForm, description: e })
+          }
           otherStyles="mt-7"
-          multiline={true}
+          multiline
           numberOfLines={5}
         />
+
         <FormField
           title="Item Type"
-          value={form.itemType}
+          value={createForm.itemType}
           placeholder="Item Type of your game..."
-          handleChangeText={(e) => setForm({ ...form, itemType: e })}
+          handleChangeText={(e) =>
+            setCreateForm({ ...createForm, itemType: e })
+          }
           otherStyles="mt-7"
         />
 
-        <LocationPicker location={form.location} setLocation={setLocation} />
+        <LocationPicker
+          location={createForm.location}
+          setLocation={setLocation}
+        />
 
         <CustomButton
           title="Submit & Publish"
