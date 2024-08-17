@@ -2,22 +2,31 @@ import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import uuid from "react-native-uuid";
 
 const authKit = process.env.EXPO_PUBLIC_AUTH_KIT || ``;
 const authenticateUrl = process.env.EXPO_PUBLIC_AUTHENTICATE || ``;
 
 export class AuthService {
   static async initiateAuthSession() {
+    const state = uuid.v4() as string;
+    await AsyncStorage.setItem("auth_state", state);
+
     const redirect = AuthSession.makeRedirectUri({
       path: "auth/callback",
     }).toString();
-    let url = authKit;
+    let url = `${authKit}?state=${encodeURIComponent(state)}`;
     let result = await WebBrowser.openAuthSessionAsync(url, redirect);
     return result;
   }
 
-  static async exchangeCodeForToken(code: string) {
+  static async exchangeCodeForToken(code: string, returnedState: string) {
     try {
+      const storedState = await AsyncStorage.getItem("auth_state");
+      if (storedState !== returnedState) {
+        throw new Error("Invalid state. Possible CSRF attack.");
+      }
+
       const response = await axios.post(authenticateUrl, {
         client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
         client_secret: process.env.EXPO_PUBLIC_API_URL,
@@ -35,6 +44,8 @@ export class AuthService {
     } catch (error) {
       console.error("Error exchanging code for token:", error);
       throw error;
+    } finally {
+      await AsyncStorage.removeItem("auth_state");
     }
   }
 

@@ -10,7 +10,7 @@ import { TokenStorage } from "@/services/storageService";
 const Callback = () => {
   const router = useRouter();
 
-  const { code } = useLocalSearchParams();
+  const { code, state } = useLocalSearchParams();
   const { setUser, setAccessToken } = useGlobalContext();
 
   const [isError, setIsError] = useState(true);
@@ -20,7 +20,7 @@ const Callback = () => {
     const userCall = async () => {
       try {
         if (typeof code === "string") {
-          const data = await AuthService.exchangeCodeForToken(code);
+          const data = await AuthService.exchangeCodeForToken(code, state);
           const { refresh_token, access_token, user } = data;
 
           const backendData = await AuthService.registerUser(access_token);
