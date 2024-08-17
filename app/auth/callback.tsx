@@ -25,7 +25,6 @@ const Callback = () => {
 
           const backendData = await AuthService.registerUser(access_token);
 
-          console.log(backendData);
           if (backendData) {
             setUser(user);
             setAccessToken(access_token);
